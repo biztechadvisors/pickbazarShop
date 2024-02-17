@@ -6,8 +6,8 @@ import { CART_KEY } from '@/lib/constants';
 import { useAtom } from 'jotai';
 import { verifiedResponseAtom } from '@/store/checkout';
 interface CartProviderState extends State {
-  addItemsToCart: (items: Item[]) => void;
-  addItemToCart: (item: Item, quantity: number) => void;
+  // addItemsToCart: (items: Item[]) => void;
+  addItemToCart: (item: Item, quantity: number, customerId:number, email:string, phone:string) => void;
   removeItemFromCart: (id: Item['id']) => void;
   clearItemFromCart: (id: Item['id']) => void;
   getItemFromCart: (id: Item['id']) => any | undefined;
@@ -50,10 +50,12 @@ export const CartProvider: React.FC<{ children?: React.ReactNode }> = (
     saveCart(JSON.stringify(state));
   }, [state, saveCart]);
 
-  const addItemsToCart = (items: Item[]) =>
-    dispatch({ type: 'ADD_ITEMS_WITH_QUANTITY', items });
-  const addItemToCart = (item: Item, quantity: number) =>
-    dispatch({ type: 'ADD_ITEM_WITH_QUANTITY', item, quantity });
+  // const addItemsToCart = (items: Item[]) =>
+  //   dispatch({ type: 'ADD_ITEMS_WITH_QUANTITY', items });
+  // const addItemToCart = (item: Item, quantity: number) =>
+  //   dispatch({ type: 'ADD_ITEM_WITH_QUANTITY', item, quantity });
+  const addItemToCart = (item: Item, quantity: number, customerId:number, email:string, phone:string) =>
+    dispatch({ type: 'ADD_ITEM_WITH_QUANTITY', item, quantity, customerId, email, phone });
   const removeItemFromCart = (id: Item['id']) =>
     dispatch({ type: 'REMOVE_ITEM_OR_QUANTITY', id });
   const clearItemFromCart = (id: Item['id']) =>
@@ -76,7 +78,7 @@ export const CartProvider: React.FC<{ children?: React.ReactNode }> = (
   const value = React.useMemo(
     () => ({
       ...state,
-      addItemsToCart,
+      // addItemsToCart,
       addItemToCart,
       removeItemFromCart,
       clearItemFromCart,

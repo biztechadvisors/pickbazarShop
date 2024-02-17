@@ -9,6 +9,7 @@ import { Form } from '@/components/ui/forms/form';
 import type { RegisterUserInput } from '@/types';
 import * as yup from 'yup';
 import { useRegister } from '@/framework/user';
+import OtpCodeForm from '../otp/code-verify-form';
 
 const registerFormSchema = yup.object().shape({
   name: yup.string().required('error-name-required'),

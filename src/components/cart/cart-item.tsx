@@ -7,9 +7,18 @@ import { fadeInOut } from '@/lib/motion/fade-in-out';
 import usePrice from '@/lib/use-price';
 import { useTranslation } from 'next-i18next';
 import { useCart } from '@/store/quick-cart/cart.context';
+import { useUser } from '@/framework/user';
 
 interface CartItemProps {
   item: any;
+}
+
+export interface CustomerData {
+  customerId: number;
+  email: string;
+  phone: string;
+  cartData: any;
+  quantity: number;
 }
 
 const CartItem = ({ item }: CartItemProps) => {
@@ -23,6 +32,8 @@ const CartItem = ({ item }: CartItemProps) => {
     language,
   } = useCart();
 
+  const { me }:any = useUser();
+
   const { price } = usePrice({
     amount: item.price,
   });
@@ -35,8 +46,21 @@ const CartItem = ({ item }: CartItemProps) => {
     if (item?.language !== language) {
       updateCartLanguage(item?.language);
     }
-    addItemToCart(item, 1);
-  }
+    // addItemToCart(item, 1);
+    const customerData: CustomerData = {
+      customerId: me.id,
+      email: me.email,
+      phone: '8770144721',
+      cartData: item,
+    };
+    addItemToCart(
+      customerData,
+      1,
+      customerData.customerId,
+      customerData.email, 
+      customerData.phone ? customerData.phone : null, 
+      )
+    }
   const handleRemoveClick = (e: any) => {
     e.stopPropagation();
     removeItemFromCart(item.id);

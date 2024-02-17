@@ -16,6 +16,7 @@ import QueryProvider from '@/framework/client/query-provider';
 import { getDirection } from '@/lib/constants';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import { Hydrate } from 'react-query';
 const ToastContainer = dynamic(
   () => import('react-toastify').then((module) => module.ToastContainer),
   { ssr: false }
@@ -44,26 +45,28 @@ function CustomApp({
       <div dir={dir}>
         <SessionProvider session={session}>
           <QueryProvider pageProps={pageProps}>
-            <SearchProvider>
-              <ModalProvider>
-                <CartProvider>
-                  <>
-                    <DefaultSeo />
-                    {authenticationRequired ? (
-                      <PrivateRoute>
-                        {getLayout(<Component {...pageProps} />)}
-                      </PrivateRoute>
-                    ) : (
-                      getLayout(<Component {...pageProps} />)
-                    )}
-                    <ManagedModal />
-                    <ManagedDrawer />
-                    <ToastContainer autoClose={2000} theme="colored" />
-                    <SocialLogin />
-                  </>
-                </CartProvider>
-              </ModalProvider>
-            </SearchProvider>
+            <Hydrate state={pageProps?.dehydratedState}>
+              <SearchProvider>
+                <ModalProvider>
+                  <CartProvider>
+                    <>
+                      <DefaultSeo />
+                      {authenticationRequired ? (
+                        <PrivateRoute>
+                          {getLayout(<Component {...pageProps} />)}
+                        </PrivateRoute>
+                      ) : (
+                        getLayout(<Component {...pageProps} />)
+                      )}
+                      <ManagedModal />
+                      <ManagedDrawer />
+                      <ToastContainer autoClose={2000} theme="colored" />
+                      <SocialLogin />
+                    </>
+                  </CartProvider>
+                </ModalProvider>
+              </SearchProvider>
+            </Hydrate>
           </QueryProvider>
         </SessionProvider>
       </div>

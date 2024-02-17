@@ -3,6 +3,7 @@ import AddToCartBtn from '@/components/products/add-to-cart/add-to-cart-btn';
 import { cartAnimation } from '@/lib/cart-animation';
 import { useCart } from '@/store/quick-cart/cart.context';
 import { generateCartItem } from '@/store/quick-cart/generate-cart-item';
+import { useUser } from '@/framework/user';
 
 interface Props {
   data: any;
@@ -26,6 +27,14 @@ interface Props {
   disabled?: boolean;
 }
 
+export interface CustomerData {
+  customerId: number;
+  email: string;
+  phone: string;
+  cartData: any;
+  quantity: number;
+}
+
 export const AddToCart = ({
   data,
   variant = 'helium',
@@ -43,8 +52,9 @@ export const AddToCart = ({
     updateCartLanguage,
     language,
   } = useCart();
-  
+  const { me }:any = useUser();
   const item = generateCartItem(data, variation);
+  console.log("newitem", item)
   const handleAddClick = (
     e: React.MouseEvent<HTMLButtonElement | MouseEvent>
   ) => {
@@ -53,7 +63,22 @@ export const AddToCart = ({
     if (item?.language !== language) {
       updateCartLanguage(item?.language);
     }
-    addItemToCart(item, 1);
+    // addItemToCart(item, 1);
+    
+    const customerData: CustomerData = {
+      customerId: 10,
+      email: "arman.codenox@gmail.com",
+      phone: '8770144721',
+      cartData: item,
+    };
+    addItemToCart(
+      customerData,
+      1,
+      customerData.customerId,
+      customerData.email, 
+      customerData.phone, 
+      )
+
     if (!isInCart(item.id)) {
       cartAnimation(e);
     }

@@ -1,3 +1,142 @@
+// import axios from 'axios';
+// import {
+//   Item,
+//   UpdateItemInput,
+//   addItemWithQuantity,
+//   removeItemOrQuantity,
+//   addItem,
+//   updateItem,
+//   removeItem,
+//   calculateUniqueItems,
+//   calculateItemTotals,
+//   calculateTotalItems,
+//   calculateTotal,
+// } from './cart.utils';
+
+// interface Metadata {
+//   [key: string]: any;
+// }
+
+// type Action =
+//   | { type: 'ADD_ITEMS_WITH_QUANTITY'; items: Item[] }
+//   | { type: 'ADD_ITEM_WITH_QUANTITY'; item: Item; quantity: number }
+//   | { type: 'REMOVE_ITEM_OR_QUANTITY'; id: Item['id']; quantity?: number }
+//   | { type: 'ADD_ITEM'; id: Item['id']; item: Item }
+//   | { type: 'UPDATE_ITEM'; id: Item['id']; item: UpdateItemInput }
+//   | { type: 'REMOVE_ITEM'; id: Item['id'] }
+//   | { type: 'RESET_CART' }
+//   | { type: 'UPDATE_CART_LANGUAGE'; language: string };
+
+// export interface State {
+//   items: Item[];
+//   isEmpty: boolean;
+//   totalItems: number;
+//   totalUniqueItems: number;
+//   total: number;
+//   meta?: Metadata | null;
+//   language: string;
+// }
+
+// export const initialState: State = {
+//   items: [],
+//   isEmpty: true,
+//   totalItems: 0,
+//   totalUniqueItems: 0,
+//   total: 0,
+//   meta: null,
+//   language: 'en',
+// };
+
+// let updateCartTimeout: NodeJS.Timeout | null = null;
+
+// export function cartReducer(state: State, action: Action): State {
+//   switch (action.type) {
+//     // case 'ADD_ITEMS_WITH_QUANTITY': {
+//     //   const items = [...state.items, ...action.items];
+//     //   return generateFinalState(state, items);
+//     // }
+//     // case 'ADD_ITEM_WITH_QUANTITY': {
+//     //   const items = addItemWithQuantity(
+//     //     state.items,
+//     //     action.item,
+//     //     action.quantity
+//     //   );
+//     //   return generateFinalState(state, items);
+//     // }
+
+//     case 'ADD_ITEM_WITH_QUANTITY': {
+//       const items = addItemWithQuantity(state.items,action.item.cartData,action.quantity);
+//       //  updateCartApi(items, action.customerId, action.email, action.phone);
+//       if (updateCartTimeout) {
+//         clearTimeout(updateCartTimeout);
+//       }
+//       updateCartTimeout = setTimeout(() => {
+//         updateCartApi(items, action.customerId, action.email, action.phone);
+//       }, 1000);
+//       return generateFinalState(state, items);
+//     }
+//     case 'REMOVE_ITEM_OR_QUANTITY': {
+//       const items = removeItemOrQuantity(
+//         state.items,
+//         action.id,
+//         action.quantity ?? 1
+//       );
+//       return generateFinalState(state, items);
+//     }
+//     case 'ADD_ITEM': {
+//       const items = addItem(state.items, action.item);
+//       return generateFinalState(state, items);
+//     }
+//     case 'REMOVE_ITEM': {
+//       const items = removeItem(state.items, action.id);
+//       return generateFinalState(state, items);
+//     }
+//     case 'UPDATE_ITEM': {
+//       const items = updateItem(state.items, action.id, action.item);
+//       return generateFinalState(state, items);
+//     }
+//     case 'UPDATE_CART_LANGUAGE': {
+//       return {
+//         ...initialState,
+//         language: action.language,
+//       };
+//     }
+//     case 'RESET_CART':
+//       return initialState;
+//     default:
+//       return state;
+//   }
+// }
+
+// const generateFinalState = (state: State, items: Item[]) => {
+//   const totalUniqueItems = calculateUniqueItems(items);
+//   return {
+//     ...state,
+//     items: calculateItemTotals(items),
+//     totalItems: calculateTotalItems(items),
+//     totalUniqueItems,
+//     total: calculateTotal(items),
+//     isEmpty: totalUniqueItems === 0,
+//   };
+// };
+
+// async function updateCartApi(items: Item[], customerId, email, phone): Promise<void> {
+//   try {
+//     await axios.post('http://localhost:5000/api/carts',{
+//       customerId,
+//       email,
+//       phone,
+//       cartData: items
+//     });
+//     console.log('Cart updated successfully');
+//   } catch (error) {
+//     console.error('Failed to update cart:', error.message);
+//     throw new Error('Failed to update cart');
+//   }
+// }
+
+
+import axios from 'axios';
 import {
   Item,
   UpdateItemInput,
@@ -11,21 +150,19 @@ import {
   calculateTotalItems,
   calculateTotal,
 } from './cart.utils';
-
+ 
 interface Metadata {
   [key: string]: any;
 }
-
+ 
 type Action =
-  | { type: 'ADD_ITEMS_WITH_QUANTITY'; items: Item[] }
   | { type: 'ADD_ITEM_WITH_QUANTITY'; item: Item; quantity: number }
   | { type: 'REMOVE_ITEM_OR_QUANTITY'; id: Item['id']; quantity?: number }
   | { type: 'ADD_ITEM'; id: Item['id']; item: Item }
   | { type: 'UPDATE_ITEM'; id: Item['id']; item: UpdateItemInput }
   | { type: 'REMOVE_ITEM'; id: Item['id'] }
-  | { type: 'RESET_CART' }
-  | { type: 'UPDATE_CART_LANGUAGE'; language: string };
-
+  | { type: 'RESET_CART' };
+ 
 export interface State {
   items: Item[];
   isEmpty: boolean;
@@ -33,9 +170,7 @@ export interface State {
   totalUniqueItems: number;
   total: number;
   meta?: Metadata | null;
-  language: string;
 }
-
 export const initialState: State = {
   items: [],
   isEmpty: true,
@@ -43,28 +178,28 @@ export const initialState: State = {
   totalUniqueItems: 0,
   total: 0,
   meta: null,
-  language: 'en',
 };
-
-export function cartReducer(state: State, action: Action): State {
+ 
+let updateCartTimeout: NodeJS.Timeout | null = null;
+ 
+export  function cartReducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'ADD_ITEMS_WITH_QUANTITY': {
-      const items = [...state.items, ...action.items];
-      return generateFinalState(state, items);
-    }
     case 'ADD_ITEM_WITH_QUANTITY': {
-      const items = addItemWithQuantity(
-        state.items,
-        action.item,
-        action.quantity
-      );
+      const items = addItemWithQuantity(state.items,action.item.cartData,action.quantity);
+      //  updateCartApi(items, action.customerId, action.email, action.phone);
+      if (updateCartTimeout) {
+        clearTimeout(updateCartTimeout);
+      }
+      updateCartTimeout = setTimeout(() => {
+        updateCartApi(items, action.customerId, action.email, action.phone);
+      }, 1000);
       return generateFinalState(state, items);
     }
     case 'REMOVE_ITEM_OR_QUANTITY': {
       const items = removeItemOrQuantity(
         state.items,
         action.id,
-        action.quantity ?? 1
+        (action.quantity = 1)
       );
       return generateFinalState(state, items);
     }
@@ -80,19 +215,13 @@ export function cartReducer(state: State, action: Action): State {
       const items = updateItem(state.items, action.id, action.item);
       return generateFinalState(state, items);
     }
-    case 'UPDATE_CART_LANGUAGE': {
-      return {
-        ...initialState,
-        language: action.language,
-      };
-    }
     case 'RESET_CART':
       return initialState;
     default:
       return state;
   }
 }
-
+ 
 const generateFinalState = (state: State, items: Item[]) => {
   const totalUniqueItems = calculateUniqueItems(items);
   return {
@@ -104,3 +233,19 @@ const generateFinalState = (state: State, items: Item[]) => {
     isEmpty: totalUniqueItems === 0,
   };
 };
+ 
+ 
+async function updateCartApi(items: Item[], customerId, email, phone): Promise<void> {
+  try {
+    await axios.post('http://localhost:5000/api/carts',{
+      customerId,
+      email,
+      phone,
+      cartData: items
+    });
+    console.log('Cart updated successfully');
+  } catch (error) {
+    console.error('Failed to update cart:', error.message);
+    throw new Error('Failed to update cart');
+  }
+}
