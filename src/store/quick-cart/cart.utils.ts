@@ -60,6 +60,7 @@ export function removeItemOrQuantity(
   id: Item["id"],
   quantity: number
 ) {
+  console.log("items-c2", items)
   return items.reduce((acc: Item[], item) => {
     if (item.id === id) {
       const newQuantity = item.quantity! - quantity;

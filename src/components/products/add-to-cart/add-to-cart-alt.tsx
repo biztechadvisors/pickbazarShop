@@ -53,7 +53,6 @@ export const AddToCartAlt = ({
     if (item?.language !== language){
       updateCartLanguage(item?.language);
     }
-    console.log("myitem", item)
     addItemToCart(item, quantity);
     setQuantity(1);
     if (!isInCart(item.id)) {

@@ -4,6 +4,7 @@ import { cartAnimation } from '@/lib/cart-animation';
 import { useCart } from '@/store/quick-cart/cart.context';
 import { generateCartItem } from '@/store/quick-cart/generate-cart-item';
 import { useUser } from '@/framework/user';
+import { CustomerData } from '@/types';
 
 interface Props {
   data: any;
@@ -27,13 +28,6 @@ interface Props {
   disabled?: boolean;
 }
 
-export interface CustomerData {
-  customerId: number;
-  email: string;
-  phone: string;
-  cartData: any;
-  quantity: number;
-}
 
 export const AddToCart = ({
   data,
@@ -52,9 +46,17 @@ export const AddToCart = ({
     updateCartLanguage,
     language,
   } = useCart();
+
   const { me }:any = useUser();
   const item = generateCartItem(data, variation);
-  console.log("newitem", item)
+
+  const customerData: CustomerData = {
+    customerId: me?.id,
+    email: me?.email,
+    phone: me?.contact? me.contact: '',
+    cartData: item,
+  };
+
   const handleAddClick = (
     e: React.MouseEvent<HTMLButtonElement | MouseEvent>
   ) => {
@@ -65,12 +67,7 @@ export const AddToCart = ({
     }
     // addItemToCart(item, 1);
     
-    const customerData: CustomerData = {
-      customerId: 10,
-      email: "arman.codenox@gmail.com",
-      phone: '8770144721',
-      cartData: item,
-    };
+   
     addItemToCart(
       customerData,
       1,
@@ -85,7 +82,14 @@ export const AddToCart = ({
   };
   const handleRemoveClick = (e: any) => {
     e.stopPropagation();
-    removeItemFromCart(item.id);
+    // removeItemFromCart(item.id);
+    removeItemFromCart(
+      item.id, 
+      customerData,
+      1,
+      customerData.customerId,
+      customerData.email, 
+      customerData.phone, )
   };
   const outOfStock = isInCart(item?.id) && !isInStock(item.id);
   return !isInCart(item?.id) ? (

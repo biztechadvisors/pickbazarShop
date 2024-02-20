@@ -15,6 +15,7 @@ export const Routes = {
   coupons: '/offers',
   orderReceived: '/order-received',
   products: '/products',
+  otp:'/otp',
   product: (slug: string) => {
     // if (asPath) {
     //   return `/products/${encodeURIComponent(slug)}?type=${asPath}`;

@@ -357,6 +357,7 @@ export function useRegister() {
   const { setToken } = useToken();
   const [_, setAuthorized] = useAtom(authorizationAtom);
   const { closeModal } = useModalAction();
+  const router = useRouter()
   let [formError, setFormError] = useState<Partial<RegisterUserInput> | null>(
     null
   );
@@ -366,6 +367,7 @@ export function useRegister() {
       if (data?.token && data?.permissions?.length) {
         setToken(data?.token);
         setAuthorized(true);
+        router.push(`${Routes.otp}`);
         closeModal();
         return;
       }

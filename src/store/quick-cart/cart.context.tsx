@@ -5,11 +5,14 @@ import { useLocalStorage } from '@/lib/use-local-storage';
 import { CART_KEY } from '@/lib/constants';
 import { useAtom } from 'jotai';
 import { verifiedResponseAtom } from '@/store/checkout';
+import { useCartsMutation } from '@/framework/cart';
 interface CartProviderState extends State {
   // addItemsToCart: (items: Item[]) => void;
   addItemToCart: (item: Item, quantity: number, customerId:number, email:string, phone:string) => void;
-  removeItemFromCart: (id: Item['id']) => void;
-  clearItemFromCart: (id: Item['id']) => void;
+  // removeItemFromCart: (id: Item['id']) => void;
+  removeItemFromCart: (id: Item['id'],item: Item, quantity: number, customerId:number, email:string, phone:string) => void;
+
+  clearItemFromCart: (id: Item['id'],email:string) => void;
   getItemFromCart: (id: Item['id']) => any | undefined;
   isInCart: (id: Item['id']) => boolean;
   isInStock: (id: Item['id']) => boolean;
@@ -42,13 +45,25 @@ export const CartProvider: React.FC<{ children?: React.ReactNode }> = (
     savedCart ? JSON.parse(savedCart) : initialState
   );
   const [, emptyVerifiedResponse] = useAtom(verifiedResponseAtom);
+  const { mutate: createCart, isLoading: creating } = useCartsMutation();
   React.useEffect(() => {
     emptyVerifiedResponse(null);
   }, [emptyVerifiedResponse, state]);
 
   React.useEffect(() => {
     saveCart(JSON.stringify(state));
+    const data = {
+      customerId: state.customerId,
+      email:state.email,
+      phone:state.phone,
+      cartData:{
+          ...state.items
+      },
+    }
+    console.log("mycartSaved2", data)
+    createCart(data)
   }, [state, saveCart]);
+
 
   // const addItemsToCart = (items: Item[]) =>
   //   dispatch({ type: 'ADD_ITEMS_WITH_QUANTITY', items });
@@ -56,10 +71,10 @@ export const CartProvider: React.FC<{ children?: React.ReactNode }> = (
   //   dispatch({ type: 'ADD_ITEM_WITH_QUANTITY', item, quantity });
   const addItemToCart = (item: Item, quantity: number, customerId:number, email:string, phone:string) =>
     dispatch({ type: 'ADD_ITEM_WITH_QUANTITY', item, quantity, customerId, email, phone });
-  const removeItemFromCart = (id: Item['id']) =>
-    dispatch({ type: 'REMOVE_ITEM_OR_QUANTITY', id });
-  const clearItemFromCart = (id: Item['id']) =>
-    dispatch({ type: 'REMOVE_ITEM', id });
+  const removeItemFromCart = (id: Item['id'],item: Item, quantity: number, customerId:number, email:string, phone:string) =>
+    dispatch({ type: 'REMOVE_ITEM_OR_QUANTITY', id, item, quantity, customerId, email, phone});
+  const clearItemFromCart = (id: Item['id'],email:string) =>
+    dispatch({ type: 'REMOVE_ITEM', id, email });
   const isInCart = useCallback(
     (id: Item['id']) => !!getItem(state.items, id),
     [state.items]

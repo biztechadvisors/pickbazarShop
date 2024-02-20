@@ -692,6 +692,15 @@ export interface CardInput {
 //   FULL_WALLET_PAYMENT = 'Full wallet payment',
 // }
 
+
+export interface CustomerData {
+  customerId: number;
+  email: string;
+  phone: string;
+  cartData: any;
+  quantity: number;
+}
+
 export interface CreateOrderInput {
   customer_contact: string;
   customer_name?: string;

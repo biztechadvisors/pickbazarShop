@@ -84,6 +84,7 @@ import type {
   StoreNotice,
   //@ts-ignore
   ShopMapLocation,
+  CustomerData,
 } from '@/types';
 import { API_ENDPOINTS } from './api-endpoints';
 import { HttpClient } from './http-client';
@@ -213,6 +214,14 @@ class Client {
     get: ({ slug, language }: { slug: string; language: string }) =>
       HttpClient.get<Type>(`${API_ENDPOINTS.TYPES}/${slug}`, { language }),
   };
+
+  carts = {
+    create: (input: any) =>
+      HttpClient.post<CustomerData>(API_ENDPOINTS.CARTS, input),
+      clearCarts: (input: any) =>
+      HttpClient.put<CustomerData>(`${API_ENDPOINTS.CARTS}/?email=${input.email}`,input),
+  }
+
   shops = {
     all: (params: Partial<ShopQueryOptions>) =>
       HttpClient.get<ShopPaginator>(API_ENDPOINTS.SHOPS, {

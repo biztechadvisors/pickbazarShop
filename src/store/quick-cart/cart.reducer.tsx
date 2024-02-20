@@ -150,11 +150,12 @@ import {
   calculateTotalItems,
   calculateTotal,
 } from './cart.utils';
- 
+import { useCartsMutation } from '@/framework/cart';
+
 interface Metadata {
   [key: string]: any;
 }
- 
+
 type Action =
   | { type: 'ADD_ITEM_WITH_QUANTITY'; item: Item; quantity: number }
   | { type: 'REMOVE_ITEM_OR_QUANTITY'; id: Item['id']; quantity?: number }
@@ -162,7 +163,7 @@ type Action =
   | { type: 'UPDATE_ITEM'; id: Item['id']; item: UpdateItemInput }
   | { type: 'REMOVE_ITEM'; id: Item['id'] }
   | { type: 'RESET_CART' };
- 
+
 export interface State {
   items: Item[];
   isEmpty: boolean;
@@ -179,21 +180,23 @@ export const initialState: State = {
   total: 0,
   meta: null,
 };
- 
+
 let updateCartTimeout: NodeJS.Timeout | null = null;
- 
-export  function cartReducer(state: State, action: Action): State {
+
+export function cartReducer(state: State, action: Action): State {
+  // const { mutate: createCart, isLoading: creating } = useCartsMutation();
   switch (action.type) {
     case 'ADD_ITEM_WITH_QUANTITY': {
-      const items = addItemWithQuantity(state.items,action.item.cartData,action.quantity);
+      const items = addItemWithQuantity(state.items, action.item.cartData, action.quantity);
       //  updateCartApi(items, action.customerId, action.email, action.phone);
       if (updateCartTimeout) {
         clearTimeout(updateCartTimeout);
       }
-      updateCartTimeout = setTimeout(() => {
-        updateCartApi(items, action.customerId, action.email, action.phone);
-      }, 1000);
-      return generateFinalState(state, items);
+      // updateCartTimeout = setTimeout(() => {
+      //   // updateCartApi(items, action.customerId, action.email, action.phone);
+      //   console.log("updatesCart", items, action.customerId, action.email, action.phone)
+      // }, 1000);
+      return generateFinalState(state,action, items);
     }
     case 'REMOVE_ITEM_OR_QUANTITY': {
       const items = removeItemOrQuantity(
@@ -201,19 +204,19 @@ export  function cartReducer(state: State, action: Action): State {
         action.id,
         (action.quantity = 1)
       );
-      return generateFinalState(state, items);
+      return generateFinalState(state,action, items);
     }
     case 'ADD_ITEM': {
       const items = addItem(state.items, action.item);
-      return generateFinalState(state, items);
+      return generateFinalState(state,action, items);
     }
     case 'REMOVE_ITEM': {
       const items = removeItem(state.items, action.id);
-      return generateFinalState(state, items);
+      return generateFinalState(state,action, items);
     }
     case 'UPDATE_ITEM': {
       const items = updateItem(state.items, action.id, action.item);
-      return generateFinalState(state, items);
+      return generateFinalState(state,action, items);
     }
     case 'RESET_CART':
       return initialState;
@@ -221,31 +224,18 @@ export  function cartReducer(state: State, action: Action): State {
       return state;
   }
 }
- 
-const generateFinalState = (state: State, items: Item[]) => {
+
+const generateFinalState = (state: State,action:Action, items: Item[]) => {
   const totalUniqueItems = calculateUniqueItems(items);
   return {
     ...state,
     items: calculateItemTotals(items),
+    customerId: action.customerId, 
+    email:action.email, 
+    phone:action.phone,
     totalItems: calculateTotalItems(items),
     totalUniqueItems,
     total: calculateTotal(items),
     isEmpty: totalUniqueItems === 0,
   };
 };
- 
- 
-async function updateCartApi(items: Item[], customerId, email, phone): Promise<void> {
-  try {
-    await axios.post('http://localhost:5000/api/carts',{
-      customerId,
-      email,
-      phone,
-      cartData: items
-    });
-    console.log('Cart updated successfully');
-  } catch (error) {
-    console.error('Failed to update cart:', error.message);
-    throw new Error('Failed to update cart');
-  }
-}
