@@ -17,6 +17,9 @@ const registerFormSchema = yup.object().shape({
     .string()
     .email('error-email-format')
     .required('error-email-required'),
+    contact:yup 
+    .string()
+     .required('error-phone-number-required'),
   password: yup.string().required('error-password-required'),
 });
 
@@ -25,13 +28,30 @@ function RegisterForm() {
   const { openModal } = useModalAction();
   const { mutate, isLoading, formError } = useRegister();
 
-  function onSubmit({ name, email, password }: RegisterUserInput) {
-    mutate({
-      name,
-      email,
-      password,
-    });
+  // function onSubmit({ name, email, password }: RegisterUserInput) {
+  //   mutate({
+  //     name,
+  //     email,
+  //     password,
+  //   });
+    
+  // }
+
+  async function onSubmit({ name, email, contact,password }: RegisterUserInput) {
+    try {
+      await mutate({
+        name,
+        email,
+        contact,
+        password,
+      });
+      // If the registration is successful otp model open
+      openModal('OTP');
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
   }
+  
 
   return (
     <>
@@ -56,6 +76,13 @@ function RegisterForm() {
               variant="outline"
               className="mb-5"
               error={t(errors.email?.message!)}
+            />
+             <Input
+              label={t('text-contact-number')}
+              {...register('contact')}
+              variant="outline"
+              className="mb-5"
+              error={t(errors.name?.message!)}
             />
             <PasswordInput
               label={t('text-password')}
@@ -101,8 +128,8 @@ export default function RegisterView() {
   const router = useRouter();
   const { closeModal } = useModalAction();
   function handleNavigate(path: string) {
-    router.push(`/${path}`);
-    closeModal();
+    // router.push(`/${path}`);
+    // closeModal();
   }
 
   return (

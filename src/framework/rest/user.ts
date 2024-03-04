@@ -278,27 +278,42 @@ export function useSendOtpCode({
   return { mutate, isLoading, serverError, setServerError };
 }
 
-export function useVerifyOtpCode({
-  onVerifySuccess,
-}: {
-  onVerifySuccess: Function;
-}) {
+export function useVerifyOtpCode(
+  
+//   {
+//   onVerifySuccess,
+// }: {
+//   onVerifySuccess: Function;
+// }
+) {
   const [otpState, setOtpState] = useAtom(optAtom);
+  const { t } = useTranslation('common');
+  const router = useRouter();
+  const [_, setAuthorized] = useAtom(authorizationAtom);
+  const { closeModal } = useModalAction();
+  const {mutate:Login} =useLogin();
   let [serverError, setServerError] = useState<string | null>(null);
+  
   const { mutate, isLoading } = useMutation(client.users.verifyOtpCode, {
-    onSuccess: (data) => {
-      if (!data.success) {
-        setServerError(data?.message!);
+    onSuccess: async (data) => {
+      if (data.success) {
+        console.log("datadata",data)
+        toast.success(t('text-register-successful'));
+        // await Login({ email: data.email, password: data.password });
+        // setServerError(data?.message!);
+        // router.push(Routes.home);
         return;
       }
-      if (onVerifySuccess) {
-        onVerifySuccess({
-          phone_number: otpState.phoneNumber,
-        });
-      }
+      // if (onVerifySuccess) {
+      //   onVerifySuccess({
+      //     phone_number: otpState.phoneNumber,
+      //   });
+      // }
+      setAuthorized(true);
       setOtpState({
         ...initialOtpState,
       });
+      closeModal();
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -307,6 +322,7 @@ export function useVerifyOtpCode({
 
   return { mutate, isLoading, serverError, setServerError };
 }
+
 
 export function useOtpLogin() {
   const [otpState, setOtpState] = useAtom(optAtom);
@@ -351,7 +367,7 @@ export function useOtpLogin() {
 
 export function useRegister() {
 
-  console.log("Register")
+  console.log("Register",)
 
   const { t } = useTranslation('common');
   const { setToken } = useToken();
@@ -364,10 +380,11 @@ export function useRegister() {
 
   const { mutate, isLoading } = useMutation(client.users.register, {
     onSuccess: (data) => {
+      console.log("Register",data)
       if (data?.token && data?.permissions?.length) {
         setToken(data?.token);
         setAuthorized(true);
-        router.push(`${Routes.otp}`);
+        // router.push(`${Routes.otp}`);
         closeModal();
         return;
       }
@@ -551,3 +568,4 @@ export function useVerifyForgotPasswordToken() {
 
   return { mutate, isLoading, formError, setFormError };
 }
+
