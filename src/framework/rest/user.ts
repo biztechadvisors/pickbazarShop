@@ -299,9 +299,9 @@ export function useVerifyOtpCode(
       if (data.success) {
         console.log("datadata",data)
         toast.success(t('text-register-successful'));
-        // await Login({ email: data.email, password: data.password });
+        await Login({ email: data.email, password: data.password });
         // setServerError(data?.message!);
-        // router.push(Routes.home);
+        router.push(Routes.home);
         return;
       }
       // if (onVerifySuccess) {

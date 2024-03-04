@@ -653,6 +653,8 @@ export interface OtpLoginInputType {
 }
 
 export interface OTPVerifyResponse {
+  email: string;
+  password: string;
   success: string;
   message: string;
 }
