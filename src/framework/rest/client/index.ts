@@ -363,10 +363,12 @@ class Client {
       HttpClient.post<AuthResponse>(API_ENDPOINTS.SOCIAL_LOGIN, input),
     sendOtpCode: (input: SendOtpCodeInputType) =>
       HttpClient.post<OTPResponse>(API_ENDPOINTS.SEND_OTP_CODE, input),
-    verifyOtpCode: (input: VerifyOtpInputType) =>
+     verifyOtpCode: (input: VerifyOtpInputType) =>
       HttpClient.post<OTPVerifyResponse>(API_ENDPOINTS.VERIFY_OTP_CODE, input),
-    OtpLogin: (input: OtpLoginInputType) =>
+      OtpLogin: (input: OtpLoginInputType) =>
       HttpClient.post<AuthResponse>(API_ENDPOINTS.OTP_LOGIN, input),
+      resendOtp: (input: VerifyOtpInputType) =>
+      HttpClient.post<AuthResponse>(API_ENDPOINTS.RESEND_OTP_LOGIN, input),
     register: (input: RegisterUserInput) =>
       HttpClient.post<AuthResponse>(API_ENDPOINTS.USERS_REGISTER, input),
     forgotPassword: (input: ForgotPasswordUserInput) =>

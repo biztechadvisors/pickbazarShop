@@ -10,6 +10,9 @@ import type { RegisterUserInput } from '@/types';
 import * as yup from 'yup';
 import { useRegister } from '@/framework/user';
 import OtpCodeForm from '../otp/code-verify-form';
+import { userAtom } from '@/store/authorization-atom';
+import { useAtom } from 'jotai';
+import { set } from 'lodash';
 
 const registerFormSchema = yup.object().shape({
   name: yup.string().required('error-name-required'),
@@ -36,6 +39,7 @@ function RegisterForm() {
   //   });
     
   // }
+  const [_,setUser]= useAtom(userAtom);
 
   async function onSubmit({ name, email, contact,password }: RegisterUserInput) {
     try {
@@ -45,6 +49,7 @@ function RegisterForm() {
         contact,
         password,
       });
+      setUser({email, password});
       // If the registration is successful otp model open
       openModal('OTP');
     } catch (error) {

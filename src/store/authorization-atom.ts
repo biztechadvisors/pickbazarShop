@@ -7,5 +7,16 @@ export function checkIsLoggedIn() {
   if (!token) return false;
   return true;
 }
+
+interface UserData {
+  email : string;
+  password: string;
+}
+export const initialUserState: UserData = {
+ email: '',
+ password :'',
+};
+export const userAtom = atom<UserData>(initialUserState);
+
 export const authorizationAtom = atom(checkIsLoggedIn());
 

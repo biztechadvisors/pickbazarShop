@@ -8,7 +8,7 @@ import {
 } from 'react-query';
 import { toast } from 'react-toastify';
 import client from './client';
-import { authorizationAtom } from '@/store/authorization-atom';
+import { authorizationAtom, userAtom } from '@/store/authorization-atom';
 import { useAtom } from 'jotai';
 import { signOut as socialLoginSignOut } from 'next-auth/react';
 import { useToken } from '@/lib/hooks/use-token';
@@ -290,6 +290,8 @@ export function useVerifyOtpCode(
   const { t } = useTranslation('common');
   const router = useRouter();
   const [_, setAuthorized] = useAtom(authorizationAtom);
+  const [getUser, setUser]=useAtom(userAtom);
+  console.log("getUserrrrr",getUser);
   const { closeModal } = useModalAction();
   const {mutate:Login} =useLogin();
   let [serverError, setServerError] = useState<string | null>(null);
@@ -299,21 +301,21 @@ export function useVerifyOtpCode(
       if (data.success) {
         console.log("datadata",data)
         toast.success(t('text-register-successful'));
-        await Login({ email: data.email, password: data.password });
+        Login({ email: getUser.email, password: getUser.password });
+        setUser({email:'',password:''})
+        closeModal();
+        console.log("getUser",getUser)
         // setServerError(data?.message!);
         router.push(Routes.home);
         return;
       }
-      // if (onVerifySuccess) {
-      //   onVerifySuccess({
-      //     phone_number: otpState.phoneNumber,
-      //   });
-      // }
-      setAuthorized(true);
-      setOtpState({
+      else{
+        console.error("error")
+      }
+     setOtpState({
         ...initialOtpState,
       });
-      closeModal();
+      
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -323,6 +325,25 @@ export function useVerifyOtpCode(
   return { mutate, isLoading, serverError, setServerError };
 }
 
+export function useResendOtp() {
+  console.log("resendotp",)
+  const { t } = useTranslation('common');
+  const { mutate, isLoading } = useMutation(client.users.resendOtp, {
+    onSuccess: (data) => {
+      console.log("resenddata",data)
+      toast("Resend Otp send Successfully");
+    },
+    onError: (error) => {
+      const {
+        response: { data },
+      }: any = error ?? {};
+
+
+    },
+  });
+
+  return { mutate, isLoading};
+}
 
 export function useOtpLogin() {
   const [otpState, setOtpState] = useAtom(optAtom);
@@ -388,9 +409,9 @@ export function useRegister() {
         closeModal();
         return;
       }
-      if (!data.token) {
-        toast.error(`${t('error-credential-wrong')}`);
-      }
+      // if (!data.token) {
+      //   toast.error(`${t('error-credential-wrong')}`);
+      // }
     },
     onError: (error) => {
       const {

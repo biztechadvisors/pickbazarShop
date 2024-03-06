@@ -7,7 +7,10 @@ import { useModalAction } from '@/components/ui/modal/modal.context';
 import { Form } from '@/components/ui/forms/form';
 import { Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import { useVerifyOtpCode } from '@/framework/user';
+import { useVerifyOtpCode, useResendOtp } from '@/framework/user';
+import { Data } from '@react-google-maps/api';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/store/authorization-atom';
 
 interface OtpRegisterFormProps {
   onSubmit: (formData: any) => void;
@@ -37,7 +40,12 @@ export default function OtpRegisterForm({
   const { closeModal } = useModalAction();
 
   const {mutate:verifyOtp, isLoading} = useVerifyOtpCode();
+  const { mutate: resendOtp, isLoading: isResendingOtp } = useResendOtp(); 
+  const [getUser] =useAtom(userAtom);
 
+  const handleResendOtp = () => {
+    resendOtp(getUser); 
+  };
   return (
     <div className="space-y-5 rounded border border-gray-200 p-5">
       <Form<OtpRegisterFormValues>
@@ -90,10 +98,11 @@ export default function OtpRegisterForm({
             <div className="grid grid-cols-2 gap-5">
               <Button
                 variant="outline"
-                className="hover:border-red-500 hover:bg-red-500"
-                onClick={closeModal}
+                // className="hover:border-red-500 hover:bg-red-500"
+                onClick={() =>handleResendOtp(Data)}
+                disabled={isResendingOtp}
               >
-                {t('text-cancel')}
+               {isResendingOtp ? t('text-resending-otp') : t('text-resend-otp')} {/* Change button text based on loading state */}
               </Button>
 
               <Button loading={loading} disabled={loading}>
