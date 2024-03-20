@@ -13,6 +13,7 @@ import { GoogleMapLocation } from '@/types';
 import { useUpdateUser } from '@/framework/user';
 import GooglePlacesAutocomplete from '@/components/form/google-places-autocomplete';
 import { useSettings } from '@/framework/settings';
+import Select from '../ui/select/select';
 
 type FormValues = {
   title: string;
@@ -26,6 +27,37 @@ type FormValues = {
   };
   location: GoogleMapLocation;
 };
+
+const optionRegion = [
+  { value: "Andhra Pradesh", label: "Andhra Pradesh" },
+  { value: "Arunachal Pradesh", label: "Arunachal Pradesh" },
+  { value: "Assam", label: "Assam" },
+  { value: "Bihar", label: "Bihar" },
+  { value: "Chhattisgarh", label: "Chhattisgarh" },
+  { value: "Goa", label: "Goa" },
+  { value: "Gujarat", label: "Gujarat" },
+  { value: "Haryana", label: "Haryana" },
+  { value: "Himachal Pradesh", label: "Himachal Pradesh" },
+  { value: "Jharkhand", label: "Jharkhand" },
+  { value: "Karnataka", label: "Karnataka" },
+  { value: "Kerala", label: "Kerala" },
+  { value: "Madhya Pradesh", label: "Madhya Pradesh" },
+  { value: "Maharashtra", label: "Maharashtra" },
+  { value: "Manipur", label: "Manipur" },
+  { value: "Meghalaya", label: "Meghalaya" },
+  { value: "Mizoram", label: "Mizoram" },
+  { value: "Nagaland", label: "Nagaland" },
+  { value: "Odisha", label: "Odisha" },
+  { value: "Punjab", label: "Punjab" },
+  { value: "Rajasthan", label: "Rajasthan" },
+  { value: "Sikkim", label: "Sikkim" },
+  { value: "Tamil Nadu", label: "Tamil Nadu" },
+  { value: "Telangana", label: "Telangana" },
+  { value: "Tripura", label: "Tripura" },
+  { value: "Uttar Pradesh", label: "Uttar Pradesh" },
+  { value: "Uttarakhand", label: "Uttarakhand" },
+  { value: "West Bengal", label: "West Bengal" }
+];
 
 const addressSchema = yup.object().shape({
   type: yup
@@ -49,8 +81,10 @@ export const AddressForm: React.FC<any> = ({
 }) => {
   const { t } = useTranslation('common');
   const { settings } = useSettings();
+  // const [getState, setState] = useState(address?.address?.state)
   return (
     <Form<FormValues>
+
       onSubmit={onSubmit}
       className="grid h-full grid-cols-2 gap-5"
       //@ts-ignore
@@ -133,11 +167,23 @@ export const AddressForm: React.FC<any> = ({
               variant="outline"
             />
 
-            <Input
-              label={t('text-state')}
-              {...register('address.state')}
-              error={t(errors.address?.state?.message!)}
-              variant="outline"
+            <Controller
+              name="address.state"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <Label>{t('text-state')}</Label>
+                  <Select
+                    options={optionRegion}
+                    placeholder={t('Select')}
+                    defaultValue={optionRegion.find((option) => option.value === getValues('address.state'))}
+                    onChange={(selectedOption: any) => {
+                      field.onChange(selectedOption?.value);
+                      setValue('address.state', selectedOption?.value);
+                    }}
+                  />
+                </div>
+              )}
             />
 
             <Input

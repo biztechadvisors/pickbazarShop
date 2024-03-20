@@ -273,7 +273,7 @@ export function useCreateOrder() {
     const formattedInputs = {
       ...input,
       language: locale,
-      customerId: sub,
+      customerId: input.customer_id,
       customer: username,
       invoice_translated_text: {
         subtotal: t('order-sub-total'),

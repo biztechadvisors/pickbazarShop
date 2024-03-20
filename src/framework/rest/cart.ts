@@ -12,7 +12,7 @@ export const useCartsMutation = () => {
     
     return useMutation(client.carts.create, {
       onSuccess: () => {
-        toast.success('Cart Updated');
+        // toast.success('Cart Updated');
       },
       onSettled: () => {
         queryClient.invalidateQueries(API_ENDPOINTS.CARTS);

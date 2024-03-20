@@ -42,9 +42,10 @@ export const PlaceOrderAction: React.FC<{
       payment_sub_gateway,
       note,
       token,
-      payable_amount
+      payable_amount,
     },
   ] = useAtom(checkoutAtom);
+  console.log("customerData",me)
   const [discount] = useAtom(discountAtom);
   const [use_wallet_points] = useAtom(walletAtom);
   useEffect(() => {
@@ -94,6 +95,8 @@ export const PlaceOrderAction: React.FC<{
       delivery_time: delivery_time?.title,
       customer_contact,
       customer_name,
+      customer_id:me?.id,
+      customer:me,
       note,
       payment_gateway: gateWay,
       payment_sub_gateway,
@@ -110,6 +113,7 @@ export const PlaceOrderAction: React.FC<{
     delete input.shipping_address.__typename;
     //@ts-ignore
     createOrder(input);
+    console.log("my input",input)
   };
   const isDigitalCheckout = available_items.find((item) =>
     Boolean(item.is_digital)

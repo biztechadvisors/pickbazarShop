@@ -184,7 +184,6 @@ export const initialState: State = {
 let updateCartTimeout: NodeJS.Timeout | null = null;
 
 export function cartReducer(state: State, action: Action): State {
-  // const { mutate: createCart, isLoading: creating } = useCartsMutation();
   switch (action.type) {
     case 'ADD_ITEM_WITH_QUANTITY': {
       const items = addItemWithQuantity(state.items, action.item.cartData, action.quantity);
