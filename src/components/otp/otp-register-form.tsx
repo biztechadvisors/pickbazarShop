@@ -7,6 +7,10 @@ import { useModalAction } from '@/components/ui/modal/modal.context';
 import { Form } from '@/components/ui/forms/form';
 import { Controller } from 'react-hook-form';
 import * as yup from 'yup';
+import { useVerifyOtpCode, useResendOtp } from '@/framework/user';
+import { Data } from '@react-google-maps/api';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/store/authorization-atom';
 
 interface OtpRegisterFormProps {
   onSubmit: (formData: any) => void;
@@ -14,17 +18,17 @@ interface OtpRegisterFormProps {
 }
 
 type OtpRegisterFormValues = {
-  email: string;
-  name: string;
+  // email: string;
+  // name: string;
   code: string;
 };
 
 const otpLoginFormSchemaForNewUser = yup.object().shape({
-  email: yup
-    .string()
-    .email('error-email-format')
-    .required('error-email-required'),
-  name: yup.string().required('error-name-required'),
+  // email: yup
+  //   .string()
+  //   .email('error-email-format')
+  //   .required('error-email-required'),
+  // name: yup.string().required('error-name-required'),
   code: yup.string().required('error-code-required'),
 });
 
@@ -35,15 +39,25 @@ export default function OtpRegisterForm({
   const { t } = useTranslation('common');
   const { closeModal } = useModalAction();
 
+  const {mutate:verifyOtp, isLoading} = useVerifyOtpCode();
+  const { mutate: resendOtp, isLoading: isResendingOtp } = useResendOtp(); 
+  const [getUser] =useAtom(userAtom);
+
+  const handleResendOtp = () => {
+    resendOtp(getUser); 
+  };
   return (
     <div className="space-y-5 rounded border border-gray-200 p-5">
       <Form<OtpRegisterFormValues>
-        onSubmit={onSubmit}
+        onSubmit={(data:any)=>{
+          console.log("submitData",data)
+          verifyOtp(data)
+        }}
         validationSchema={otpLoginFormSchemaForNewUser}
       >
         {({ register, control, formState: { errors } }) => (
           <>
-            <Input
+            {/* <Input
               label={t('text-email')}
               {...register('email')}
               type="email"
@@ -57,7 +71,7 @@ export default function OtpRegisterForm({
               variant="outline"
               className="mb-5"
               error={t(errors.name?.message!)}
-            />
+            /> */}
 
             <div className="mb-5">
               <Label>{t('text-otp-code')}</Label>
@@ -67,7 +81,7 @@ export default function OtpRegisterForm({
                   <MobileOtpInput
                     value={value}
                     onChange={onChange}
-                    numInputs={6}
+                    numInputs={4}
                     separator={
                       <span className="hidden sm:inline-block">-</span>
                     }
@@ -84,10 +98,11 @@ export default function OtpRegisterForm({
             <div className="grid grid-cols-2 gap-5">
               <Button
                 variant="outline"
-                className="hover:border-red-500 hover:bg-red-500"
-                onClick={closeModal}
+                // className="hover:border-red-500 hover:bg-red-500"
+                onClick={() =>handleResendOtp(Data)}
+                disabled={isResendingOtp}
               >
-                {t('text-cancel')}
+               {isResendingOtp ? t('text-resending-otp') : t('text-resend-otp')} {/* Change button text based on loading state */}
               </Button>
 
               <Button loading={loading} disabled={loading}>

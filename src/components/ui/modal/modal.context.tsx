@@ -2,6 +2,7 @@ import React from 'react';
 
 type MODAL_VIEWS =
   | 'REGISTER'
+  | 'OTP'
   | 'LOGIN_VIEW'
   | 'FORGOT_VIEW'
   | 'OTP_LOGIN'

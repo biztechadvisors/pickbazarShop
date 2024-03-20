@@ -42,6 +42,7 @@ export const API_ENDPOINTS = {
   SEND_OTP_CODE: '/send-otp-code',
   VERIFY_OTP_CODE: '/verify-otp-code',
   OTP_LOGIN: '/otp-login',
+  RESEND_OTP_LOGIN:'resend-otp',
   UPDATE_CONTACT: '/update-contact',
   SETTINGS: '/settings',
   UPLOADS: '/attachments',

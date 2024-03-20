@@ -34,14 +34,14 @@
 //     },
 //   };
 // };
-import OtpCodeForm from '@/components/otp/code-verify-form'
-import OtpForm from '@/components/otp/otp-form'
-import React from 'react'
+// import OtpCodeForm from '@/components/otp/code-verify-form'
+// import OtpForm from '@/components/otp/otp-form'
+// import React from 'react'
 
-const otp = () => {
-  return (
-    <div className='flex h-full min-h-screen w-screen flex-col justify-center bg-light py-6 px-5 sm:p-8 md:h-auto md:min-h-0 md:max-w-[480px] md:rounded-xl'><OtpCodeForm /></div>
-  )
-}
+// const otp = () => {
+//   return (
+//     <div className='flex h-full min-h-screen w-screen flex-col justify-center bg-light py-6 px-5 sm:p-8 md:h-auto md:min-h-0 md:max-w-[480px] md:rounded-xl'><OtpCodeForm /></div>
+//   )
+// }
 
-export default otp
+// export default otp

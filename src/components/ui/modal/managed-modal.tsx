@@ -6,6 +6,9 @@ const OtpLoginView = dynamic(() => import('@/components/auth/otp-login'));
 const Login = dynamic(() => import('@/components/auth/login-form'), {
   ssr: false,
 });
+const Otp = dynamic(() => import('@/components/auth/otp'), {
+  ssr: false,
+});
 const Register = dynamic(() => import('@/components/auth/register-form'));
 const ForgotPassword = dynamic(
   () => import('@/components/auth/forgot-password')
@@ -85,6 +88,7 @@ const ManagedModal = () => {
     <Modal open={isOpen} onClose={closeModal}>
       {view === 'LOGIN_VIEW' && <Login />}
       {view === 'REGISTER' && <Register />}
+      {view === 'OTP' && <Otp/>}
       {view === 'FORGOT_VIEW' && <ForgotPassword />}
       {view === 'OTP_LOGIN' && <OtpLoginView />}
       {view === 'REFUND_REQUEST' && <CreateRefundView />}

@@ -8,7 +8,7 @@ import {
 } from 'react-query';
 import { toast } from 'react-toastify';
 import client from './client';
-import { authorizationAtom } from '@/store/authorization-atom';
+import { authorizationAtom, userAtom } from '@/store/authorization-atom';
 import { useAtom } from 'jotai';
 import { signOut as socialLoginSignOut } from 'next-auth/react';
 import { useToken } from '@/lib/hooks/use-token';
@@ -278,27 +278,44 @@ export function useSendOtpCode({
   return { mutate, isLoading, serverError, setServerError };
 }
 
-export function useVerifyOtpCode({
-  onVerifySuccess,
-}: {
-  onVerifySuccess: Function;
-}) {
+export function useVerifyOtpCode(
+  
+//   {
+//   onVerifySuccess,
+// }: {
+//   onVerifySuccess: Function;
+// }
+) {
   const [otpState, setOtpState] = useAtom(optAtom);
+  const { t } = useTranslation('common');
+  const router = useRouter();
+  const [_, setAuthorized] = useAtom(authorizationAtom);
+  const [getUser, setUser]=useAtom(userAtom);
+  console.log("getUserrrrr",getUser);
+  const { closeModal } = useModalAction();
+  const {mutate:Login} =useLogin();
   let [serverError, setServerError] = useState<string | null>(null);
+  
   const { mutate, isLoading } = useMutation(client.users.verifyOtpCode, {
-    onSuccess: (data) => {
-      if (!data.success) {
-        setServerError(data?.message!);
+    onSuccess: async (data) => {
+      if (data.success) {
+        console.log("datadata",data)
+        toast.success(t('text-register-successful'));
+        Login({ email: getUser.email, password: getUser.password });
+        setUser({email:'',password:''})
+        closeModal();
+        console.log("getUser",getUser)
+        // setServerError(data?.message!);
+        router.push(Routes.home);
         return;
       }
-      if (onVerifySuccess) {
-        onVerifySuccess({
-          phone_number: otpState.phoneNumber,
-        });
+      else{
+        console.error("error")
       }
-      setOtpState({
+     setOtpState({
         ...initialOtpState,
       });
+      
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -306,6 +323,26 @@ export function useVerifyOtpCode({
   });
 
   return { mutate, isLoading, serverError, setServerError };
+}
+
+export function useResendOtp() {
+  console.log("resendotp",)
+  const { t } = useTranslation('common');
+  const { mutate, isLoading } = useMutation(client.users.resendOtp, {
+    onSuccess: (data) => {
+      console.log("resenddata",data)
+      toast("Resend Otp send Successfully");
+    },
+    onError: (error) => {
+      const {
+        response: { data },
+      }: any = error ?? {};
+
+
+    },
+  });
+
+  return { mutate, isLoading};
 }
 
 export function useOtpLogin() {
@@ -351,7 +388,7 @@ export function useOtpLogin() {
 
 export function useRegister() {
 
-  console.log("Register")
+  console.log("Register",)
 
   const { t } = useTranslation('common');
   const { setToken } = useToken();
@@ -364,16 +401,17 @@ export function useRegister() {
 
   const { mutate, isLoading } = useMutation(client.users.register, {
     onSuccess: (data) => {
+      console.log("Register",data)
       if (data?.token && data?.permissions?.length) {
         setToken(data?.token);
         setAuthorized(true);
-        router.push(`${Routes.otp}`);
+        // router.push(`${Routes.otp}`);
         closeModal();
         return;
       }
-      if (!data.token) {
-        toast.error(`${t('error-credential-wrong')}`);
-      }
+      // if (!data.token) {
+      //   toast.error(`${t('error-credential-wrong')}`);
+      // }
     },
     onError: (error) => {
       const {
@@ -551,3 +589,4 @@ export function useVerifyForgotPasswordToken() {
 
   return { mutate, isLoading, formError, setFormError };
 }
+
